@@ -57,7 +57,7 @@ def movie_rank():
     movie_posters = parent.find_all(class_='box_boxoffice')
     rank = 1
 
-    wb = openpyxl.Workbook()
+    wb = xl.Workbook()
     ws_rank = wb.create_sheet("영화 순위")
     ws_url = wb.create_sheet("URL")
 
@@ -65,8 +65,7 @@ def movie_rank():
         title = movie_rank.find("strong").get_text()
         link =  "https://movie.daum.net" + movie_rank.a["href"]
         story = movie_rank.a.get_text()
-
-        print("{}.".format(rank), title, link, story)
+        #print("{}.".format(rank), title, link, story)
         ws_rank.append(["{}위".format(rank), title, story, link])
         rank += 1
 
