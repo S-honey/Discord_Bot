@@ -181,7 +181,7 @@ async def 코로나(ctx):
 
 @bot.command()
 async def 영화(ctx):
-    #crawl_daily_fortune() # 크롤링
+    movie_rank() # 크롤링
     wb = xl.load_workbook('파일경로/MovieRank.xlsx') 
     sheet1 = wb["영화 순위"]
     sheet3 = wb["URL"]
