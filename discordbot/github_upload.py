@@ -100,7 +100,7 @@ async def hello(ctx):
 
 @bot.command()
 async def 도움요청(ctx):
-    embed = discord.Embed(title='도움말', description='제작 by Seoun_hoen', color = 0x00ff00)
+    embed = discord.Embed(title='도움말', description='제작 by Seung_hoen', color = 0x00ff00)
     embed.add_field(name='1. 인사', value='ex) ㄹㅇ 안녕', inline=False)
     embed.add_field(name='2. 오늘의 운세', value='ex) ㄹㅇ 운세 <~띠>', inline=False)
     embed.add_field(name='3. 국내 코로나 현황', value='ex) ㄹㅇ 코로나', inline=False)
