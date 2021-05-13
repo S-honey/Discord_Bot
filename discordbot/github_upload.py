@@ -113,6 +113,7 @@ async def 도움요청(ctx):
     embed.add_field(name='2. 오늘의 운세', value='ex) ㄹㅇ 운세 <~띠>', inline=False)
     embed.add_field(name='3. 국내 코로나 현황', value='ex) ㄹㅇ 코로나', inline=False)
     embed.add_field(name='4. 이번주 영화 순위', value='ex) ㄹㅇ 영화', inline=False)
+    embed.add_field(name='5. 순위권 영화 정보', value='ex) ㄹㅇ 영화정보 <순위>', inline=False)
     await ctx.send(embed=embed)
 
 @bot.command()
