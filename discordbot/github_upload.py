@@ -44,37 +44,46 @@ def crawl_daily_fortune():
 
 def movie_rank():
     boxoffice = "https://movie.daum.net/ranking/boxoffice/weekly"
-    #reservation_rank = "https://movie.daum.net/ranking/reservation"
-
+    
     res1 = requests.get(boxoffice)
     res1.raise_for_status()
+    bs1  = BeautifulSoup(res1.text, "lxml")
 
-    bs1 = BeautifulSoup(res1.text, "lxml")
-
-    parent = bs1.select_one('#mainContent')
-
-    movie_ranks = parent.find_all("div", attrs={"class":"item_poster"})
-    movie_posters = parent.find_all(class_='box_boxoffice')
-    rank = 1
-
+    parent1 = bs1.select_one('#mainContent')
+    movies = parent1.find_all("div", attrs={"class":"item_poster"})
+    
     wb = xl.Workbook()
     ws_rank = wb.create_sheet("영화 순위")
-    ws_url = wb.create_sheet("URL")
+    ws_info = wb.create_sheet("영화 정보")
+    ws_rank.append(['랭크', '타이틀', '스토리', '링크', '포스터'])
 
-    for movie_rank in movie_ranks:
-        title = movie_rank.find("strong").get_text()
-        link =  "https://movie.daum.net" + movie_rank.a["href"]
-        story = movie_rank.a.get_text()
-        #print("{}.".format(rank), title, link, story)
-        ws_rank.append(["{}위".format(rank), title, story, link])
-        rank += 1
+    for movie in movies:
+        movie_rank = movie.find("span").get_text()
+        movie_title = movie.find("strong").get_text()
+        movie_link =  "https://movie.daum.net" + movie.a["href"]
+        movie_story = movie.a.get_text()
+        movie_poster = movie.find("img")
+        movie_poster_src = movie_poster["src"]
+        ws_rank.append(["{}위.".format(movie_rank), movie_title, movie_story, movie_link, movie_poster_src])
+    wb.save('MovieRank.xlsx')
 
-    for movie_poster in movie_posters:
-        poster = movie_poster.find('img')
-        poster_src = poster['src']
-        #print(poster_src)
-        ws_url.append([poster_src])
+def movie_info(num_url):
+    url_movie = num_url
 
+    res2 = requests.get(url_movie)
+    res2.raise_for_status()
+    bs2  = BeautifulSoup(res2.text, "lxml")
+
+    parent2 = bs2.select_one('#mainContent')
+    s_movie_infos = parent2.find_all("dl", attrs={"class":"list_cont"})
+
+    wb = xl.load_workbook('C:/discordbot/MovieRank.xlsx')
+    ws_info = wb["영화 정보"]
+
+    for s_movie in s_movie_infos:
+        s_movie_list = s_movie.find("dd").get_text()
+        s_movie_info = s_movie.find("dt").get_text()
+        ws_info.append([s_movie_info, s_movie_list])
     wb.save('MovieRank.xlsx')
 
 
@@ -177,39 +186,91 @@ async def 코로나(ctx):
     embed.set_thumbnail(url="https://wikis.krsocsci.org/images/7/79/%EB%8C%80%ED%95%9C%EC%99%95%EA%B5%AD_%ED%83%9C%EA%B7%B9%EA%B8%B0.jpg")
     embed.set_footer(text='Helped by Hoplin.')
     await ctx.send("Covid-19 Virus Korea Status", embed=embed)
-
+    
 @bot.command()
 async def 영화(ctx):
-    movie_rank() # 크롤링
-    wb = xl.load_workbook('파일경로/MovieRank.xlsx') 
+    movie_rank()
+    wb = xl.load_workbook('경로/MovieRank.xlsx')
     sheet1 = wb["영화 순위"]
-    sheet3 = wb["URL"]
-    rank = []
-    poster = [sheet3['A1'].value]
-    for data in sheet1['A1':'B19']:
-        for cell in data:
-            rank.append(cell.value)
+    rank, title, story, link, poster = [], [], [], [], []
 
+    for cell in sheet1['A']: # 랭크
+        rank.append(cell.value)
+    for cell in sheet1['B']: # 타이틀
+        title.append(cell.value)
+    for cell in sheet1['C']: # 스토리
+        story.append(cell.value)
+    for cell in sheet1['D']: # 링크
+        link.append(cell.value)
+    for cell in sheet1['E']: # 포스터
+        poster.append(cell.value)
     wb.close()
     
     embed = discord.Embed(title="박스오피스 영화 순위", description="현재 박스오피스 1위 ~ 10위 영화", color=0x00ffff)
-    embed.add_field(name="==================================================", value="Link : https://movie.daum.net/ranking/boxoffice/weekly", inline=False)
-    embed.add_field(name=rank[0], value=rank[1], inline=False)
+    embed.add_field(name="===========================================================", value="Link : https://movie.daum.net/ranking/boxoffice/weekly", inline=False)
+    embed.add_field(name=rank[1], value=title[1]+'\nㅤ', inline=False)
     #embed.add_field(name="==================================================", value="ㅤ", inline=False)
-    embed.add_field(name=rank[2], value=rank[3], inline=True)
-    embed.add_field(name=rank[4], value=rank[5], inline=True)
-    embed.add_field(name=rank[6], value=rank[7], inline=True)
-    embed.add_field(name=rank[8], value=rank[9], inline=True)
-    embed.add_field(name=rank[10], value=rank[11], inline=True)
-    embed.add_field(name=rank[12], value=rank[13], inline=True)
-    embed.add_field(name=rank[14], value=rank[15], inline=True)
-    embed.add_field(name=rank[16], value=rank[17], inline=True)
-    embed.add_field(name=rank[18], value=rank[19], inline=True)
-    embed.add_field(name="==================================================", value="ㅤ", inline=False)
-    embed.add_field(name='현재 1위 영화', value="1위 영화 보러가기 -----> {}".format(sheet1['D1'].value), inline=False)
-    #embed.set_thumbnail(url=poster[0])
-    embed.set_image(url=poster[0])
-    
+    embed.add_field(name=rank[2], value=title[2], inline=True)
+    embed.add_field(name=rank[3], value=title[3], inline=True)
+    embed.add_field(name=rank[4], value=title[4], inline=True)
+    embed.add_field(name=rank[5], value=title[5], inline=True)
+    embed.add_field(name=rank[6], value=title[6], inline=True)
+    embed.add_field(name=rank[7], value=title[7], inline=True)
+    embed.add_field(name=rank[8], value=title[8], inline=True)
+    embed.add_field(name=rank[9], value=title[9], inline=True)
+    embed.add_field(name=rank[10], value=title[10], inline=True)
+    embed.add_field(name="===========================================================", value="ㅤ", inline=False)
+    embed.add_field(name='현재 1위 영화', value="영화 예매 -----> {}".format(link[1]), inline=False)
+    embed.set_image(url=poster[1])
     await ctx.send(embed=embed)
+
+@bot.command()
+async def 영화정보(ctx, *, text):
+    text = int(text)
+    movie_rank()
+    
+    wb = xl.load_workbook('경로/MovieRank.xlsx')
+    sheet1 = wb["영화 순위"]
+    rank, title, story, link, poster = [], [], [], [], []
+
+    for cell in sheet1['A']:
+        rank.append(cell.value)
+    for cell in sheet1['B']:
+        title.append(cell.value)
+    for cell in sheet1['C']:
+        story.append(cell.value)
+    for cell in sheet1['D']:
+        link.append(cell.value)
+    for cell in sheet1['E']:
+        poster.append(cell.value)
+    wb.close()
+        
+    movie_info(link[text])
+    wb = xl.load_workbook('경로/MovieRank.xlsx')
+    sheet2 = wb["영화 정보"]
+    info_name, info = [], []
+
+    for cell in sheet2['A']:
+        info_name.append(cell.value)
+    for cell in sheet2['B']:
+        info.append(cell.value)
+    wb.close()
+
+    embed = discord.Embed(title=rank[text]+" 영화 정보", description='', color=0x00ffff)
+    embed.add_field(name=title[text], value=story[text][:350]+' ... \n(더 많은 정보를 아래 링크를 통해 확인하세요!)', inline=False)
+    embed.add_field(name="================================================", value="ㅤ", inline=False)
+    embed.add_field(name=info_name[0], value=info[0], inline=True)
+    embed.add_field(name=info_name[1], value=info[1], inline=True)
+    embed.add_field(name=info_name[2], value=info[2], inline=True)
+    embed.add_field(name=info_name[3], value=info[3], inline=True)
+    embed.add_field(name=info_name[4], value=info[4], inline=True)
+    embed.add_field(name=info_name[5], value=info[5], inline=True)
+    embed.add_field(name=info_name[6], value=info[6], inline=True)
+    embed.add_field(name="================================================", value="ㅤ", inline=False)
+    embed.add_field(name='현재 영화', value="영화 예매하러 가기 -----> {}".format(link[text]), inline=False)
+    embed.set_thumbnail(url=poster[text])
+    embed.set_image(url=poster[text])
+    await ctx.send(embed=embed)
+    
 
 bot.run('사용중인 봇 토큰')
