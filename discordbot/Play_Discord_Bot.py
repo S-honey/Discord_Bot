@@ -17,7 +17,7 @@ async def hello(ctx):
 
 @bot.command()
 async def 도움(ctx):
-    embed = discord.Embed(title='도움말', description='제작 by않되어떡케', color = 0x00ff00)
+    embed = discord.Embed(title='도움말', description='제작 by S-honey', color = 0x00ff00)
     embed.add_field(name='1. 인사', value='ㄹㅇ 안녕', inline=False)
     embed.add_field(name='2. 운세 [~띠]', value='ㄹㅇ 오늘의[~띠] 운세', inline=False)
     await ctx.send(embed=embed)
