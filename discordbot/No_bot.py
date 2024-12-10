@@ -73,13 +73,13 @@ async def on_ready():
     print('connection was succesful')
     await bot.change_presence(status=discord.Status.online, activity=game)
 
-@bot.command(aliases=['안녕', 'hi', '안녕하세요', 'ㅎㅇ'])
+@bot.command(aliases=['안녕', 'Hi', '안녕하세요', '안녕하십니까'])
 async def hello(ctx):
     random_num = random.randrange(1,15)
     if random_num >= 4:
         await ctx.send(f'{ctx.author.mention}님 안녕하세요!')
     elif random_num < 4: # 낮은 확률로 다른 인사
-        await ctx.send(f'어이 {ctx.author.mention} 드디어 왔구만!')
+        await ctx.send(f'{ctx.author.mention}님 잘 지내셨나요?')
 
 @bot.command()
 async def 도움(ctx):
